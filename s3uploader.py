@@ -53,11 +53,11 @@ class MyEventHandler(pyinotify.ProcessEvent):
 def s3upload(pathname, bucketname, access_key, secret_key, dir_struc):
     environ = os.environ.copy()
     compress_start = time.time()
-    log.info("Starting compression...")
+    log.info("Starting...")
     pathname = compress(pathname)
     compression_time = copy_time(time.time() - compress_start)
     keyname = os.path.basename(pathname)
-    log.info("Compressed {0} in {1}".format(keyname, compression_time))
+    log.info("Prepared {0} in {1}".format(keyname, compression_time))
     start = time.time()
     destpath = "s3://{0}/{1}/{2}".format(bucketname, dir_struc, dstname(keyname))
     command = "/usr/local/bin/aws s3 cp --storage-class {storage_class} {source} {dest}".format(
@@ -77,16 +77,24 @@ def s3upload(pathname, bucketname, access_key, secret_key, dir_struc):
     log.debug(copy.communicate())
     if copy.returncode == 0:
             log.info("Sending to {1} SUCCESS! {2} in {3}".format(pathname, destpath, file_size(pathname), copy_time(time.time() - start)))
-            if os.path.isfile(pathname):
-                  os.remove(pathname)
-            if os.path.isfile(pathnoext(pathname)):
-                  os.remove(pathnoext(pathname))
+            tmpcleanup(keyname)
             error = False
     else:
             error = True
     if error:
         log.exception("Error sending file {}".format(pathname))
         sys.exit(1)
+
+def tmpcleanup(filename):
+    tmp = args.tmp_compress
+    tmpdir = tmpsubdir(tmp)
+    tmpfile = tmpdir + "/" + filename
+    if os.path.isfile(tmpfile):
+       log.info("Temp file cleanup {1}".format(tmpfile))
+       os.remove(tmpfile)
+    if os.path.isfile(pathnoext(tmpfile)):
+       log.info("Temp file cleanup {1}".format(tmpfile))
+       os.remove(pathnoext(tmpfile))
 
 
 def in_bytes(size):
@@ -113,15 +121,10 @@ def parse_event(pathname):
 
 def checkgzip(pathname):
     if pathname.endswith('.gz'):
-           try:
-             file = gzip.open(pathname, 'rb')
-             return pathname
-           except:
-             return None
-    elif gzip.open(pathname, 'rb'):
-             return pathname
+            #file = gzip.open(pathname, 'rb')
+            return pathname
     else:
-             return None
+            return None
 
 
 def ungzip_path(pathname, path_ungziped):
@@ -207,7 +210,7 @@ def compress(pathname):
     pnew_snappy = pnew + ".snappy"
     if args.compression == "gzip":
        if checkgzip(pathname):
-          log.info("Not compressed {0}".format(pathname))
+          log.info("Already Compressed {0}".format(pathname))
           return pathname
        else:
           log.info("Compressing {0} using gzip".format(pathname))
