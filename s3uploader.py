@@ -37,6 +37,7 @@ parser.add_argument('--s3-app-dir', '-A', action="store", help='S3 in bucket dir
 parser.add_argument('--snzip-path', '-P', action="store", help='SNZIP binary location', required=False)
 parser.add_argument('--tmp-compress', '-t', action="store", help='TMP dir for compressions', default="/tmp")
 parser.add_argument('--compression', '-C', action="store", help='File compression/re-compression before S3 send', default="python-snappy", choices=['gzip', 'python-snappy', 'snzip-hadoop-snappy', 'snzip-framing-format', 'snzip-snappy-java', 'snzip-snappy-in-java', 'snzip-raw'])
+parser.add_argument('--datetime-format', '-D', action="store", help='Datetime format to be used in S3 path', default="%Y/%m/%d/%H/%M")
 args = parser.parse_args()
 
 q = Queue()
@@ -249,7 +250,8 @@ def random_name(string_length=8):
 
 def datedir():
     appname = args.s3_app_dir
-    dirname = datetime.now().strftime('%Y/%m/%d/%H/%M')
+    datetime_format = args.datetime_format
+    dirname = datetime.now().strftime(datetime_format)
     return appname + "/" + dirname
 
 
