@@ -2,6 +2,7 @@
 
 import gzip
 import snappy
+import mimetypes
 import uuid
 import time
 import subprocess
@@ -121,8 +122,8 @@ def parse_event(pathname):
 
 
 def checkgzip(pathname):
-    if pathname.endswith('.gz'):
-            #file = gzip.open(pathname, 'rb')
+    gzipmime = mimetypes.guess_type(pathname)[1]
+    if gzipmime == "gzip" or pathname.endswith('.gz'):
             return pathname
     else:
             return None
