@@ -143,3 +143,8 @@ stdout_capture_maxbytes=1MB
 
 On AWS c3.large (eu-west-1 and bucket in US standard) and default 3 threads i was able to transfer 10 logs (almost 800MB in total) in 45seconds.
 
+
+** simple .deb package build **
+```
+fpm -s dir -t deb -n s3uploader -v 0.0.1 s3uploader=/usr/local/bin/
+```
