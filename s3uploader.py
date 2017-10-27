@@ -37,7 +37,7 @@ parser.add_argument('--s3-storage-class', '-S', action="store", help='S3 storage
 parser.add_argument('--s3-app-dir', '-A', action="store", help='S3 in bucket dir name for this app', required=True)
 parser.add_argument('--snzip-path', '-P', action="store", help='SNZIP binary location', required=False)
 parser.add_argument('--tmp-compress', '-t', action="store", help='TMP dir for compressions', default="/tmp")
-parser.add_argument('--compression', '-C', action="store", help='File compression/re-compression before S3 send', default="python-snappy", choices=['gzip', 'python-snappy', 'snzip-hadoop-snappy', 'snzip-framing-format', 'snzip-snappy-java', 'snzip-snappy-in-java', 'snzip-raw'])
+parser.add_argument('--compression', '-C', action="store", help='File compression/re-compression before S3 send', default="gzip", choices=['gzip', 'python-snappy', 'snzip-hadoop-snappy', 'snzip-framing-format', 'snzip-snappy-java', 'snzip-snappy-in-java', 'snzip-raw'])
 parser.add_argument('--datetime-format', '-D', action="store", help='Datetime format to be used in S3 path', default="%Y/%m/%d/%H/%M")
 args = parser.parse_args()
 
